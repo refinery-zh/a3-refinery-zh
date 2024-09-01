@@ -151,9 +151,16 @@ def run(options,msg):
     elif options.quiet or options.superQuiet:
         displayer = None
 
+    # if random seed is not provide, using timestamp
+    if options.setRandomSeed == 90054:
+        random_seed = int(str(time.time()).replace('.', ''))
+    else:
+        random_seed = options.setRandomSeed
+    
     # make sure random seed is traceable
     random.seed(random_seed)
     seed_list = [random.randint(0,1e10) for _ in range(1000)]
+    seed_list[0] = random_seed
     seed_idx = 0
 
     num_of_warning = options.numOfWarnings
@@ -337,12 +344,15 @@ def loadParameter():
     parser.add_option('--delay', type='float', help='Delay action in a play or replay by input (float) seconds (default 0.1)', default=0.1)
     parser.add_option('-p','--print', action='store_true', help='Print all the output in terminal when playing games, will diable \'-l\' automatically. (default: False)', default=False)
     parser.add_option('--half-scale', action='store_true', help='Display game at half-scale (default is 1920x1080)', default=False)
-    # parser.add_option('--interactive', action='store_true', help="Gives the user control over the Citrine agent's actions", default=False)   
+    parser.add_option('--interactive', action='store_true', help="Gives the user control over the Citrine agent's actions (This is not available for Azul)", default=False)   
 
     options, otherjunk = parser.parse_args(sys.argv[1:] )
     assert len(otherjunk) == 0, "Unrecognized options: " + str(otherjunk)
     # if options.interactive:
     #     options.citrineName = 'Human'
+    if options.interactive:
+        options.interactive = False
+
     return options
 
 
