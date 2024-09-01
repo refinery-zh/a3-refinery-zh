@@ -62,12 +62,11 @@ There will be an initial start-up allowance of 15 seconds. During this time, you
 **Make sure the version of Python used is >= 3.8, and that you have installed the following packages:**
 ```
 func-timeout
-GitPython
 pytz
 ```
 You can install them by running the following command:
 ```bash
-$ python -m pip install func_timeout pytz GitPython
+$ python -m pip install func_timeout pytz
 ```
 
 By default, you can run a game against two random agents with the following:
