@@ -1,10 +1,10 @@
 # INFORMATION ------------------------------------------------------------------------------------------------------- #
 
 
-# Author:  Steven Spratley, extending code by Guang Ho and Michelle Blom
-# Date:    12/02/23
+# Author:  Guang Hu, extended from Steven Spratley
+# Date:    01/09/24
 # Purpose: Defines a general game runner for the COMP90054 competitive game environment
-# Notes:   This port is incomplete, and will req
+# Notes:   
 
 
 # IMPORTS ------------------------------------------------------------------------------------------------------------#
@@ -32,115 +32,15 @@ from optparse import OptionParser
 # CONSTANTS ----------------------------------------------------------------------------------------------------------#
 
 
-# team_indexs   = ["red_team","blue_team"]
+
 DEFAULT_AGENT = "agents.generic.random"
 DEFAULT_AGENT_NAME = "default"
-# NUM_AGENTS    = 2
 GIT_TOKEN_PATH = "configs/git_token.txt"
 TIMEZONE = pytz.timezone('Australia/Melbourne')
 DATE_FORMAT = '%d/%m/%Y %H:%M:%S'  # RMIT Uni (Australia)
 
 
 # CLASS DEF ----------------------------------------------------------------------------------------------------------#
-
-
-def is_git_repo(path):
-    try:
-        _ = git.Repo(path).git_dir
-        return True
-    except git.InvalidGitRepositoryError:
-        return False
-
-# Extract the timestamp for a given tag in a repo
-def get_commit_time(repo:git.Repo):
-    """
-    Returns the commit time based on the TIMEZONE
-
-    :param repo: the repository 
-    :return: the commit time
-    """
-    commit = repo.commit()
-    commit_date = datetime.datetime.fromtimestamp(commit.committed_date, tz=TIMEZONE)
-    return commit_date.strftime(DATE_FORMAT)
-
-def gitCloneTeam(team_info, output_path):
-    
-    
-    if team_info['agent'] == 'agents.generic.random':
-        team_info.update({'git':'succ'})
-        return team_info
-    
-    token = None
-    with open(GIT_TOKEN_PATH, "r") as f:
-        token = f.read()
-    
-
-    if not os.path.exists(output_path):
-        os.makedirs(output_path)    
-    print(team_info)
-    clone_url = f"https://{token}@{team_info['url'].replace('https://','')}"
-    team_name = str(team_info['team_name'])
-    repo_path = f"{output_path}/{str(team_info['team_name'])}"
-    commit_id = team_info['commit_id']
-    branch = "main"
-
-    logging.info(f'Checking {repo_path} contains git repo or not.')
-    submission_time='N/A'
-    if not os.path.exists(repo_path):
-        os.makedirs(repo_path)
-
-    if not is_git_repo(repo_path):
-        logging.info(f'Trying to clone NEW team repo from URL {clone_url.replace(token,"")}.')
-        try:
-            # repo = git.Repo.clone_from(clone_url, repo_path, branch=branch, no_checkout=True)
-            repo = git.Repo.clone_from(clone_url, repo_path,  no_checkout=True)
-            repo.git.checkout(commit_id)
-            # repo = git.Repo.clone_from(clone_url, repo_path)
-            submission_time = get_commit_time(repo)
-            logging.info(f'Team {team_name} cloned successfully with tag date {submission_time}.')
-            team_info.update({'git':'succ'})
-            team_info.update({'comments':'N/A'})
-            team_info.update({'submitted_time': submission_time})
-            repo.close()
-            # teams_new.append(team_name)
-        except git.GitCommandError as e:
-            # teams_missing.append(team_name)
-            logging.warning(f'Repo for team {team_name} with tag/branch "{branch}" cannot be cloned: {e.stderr.replace(token,"")}')
-
-            team_info.update({'git':'failed'})
-            team_info.update({'comments':f'Repo for team {team_name} with tag/branch {branch} cannot be cloned: {e.stderr.replace(token,"")}'})
-            # repo.close()
-        except KeyboardInterrupt:
-            logging.warning('Script terminated via Keyboard Interrupt; finishing...')
-            sys.exit("keyboard interrupted!")
-            # repo.close()
-        except TypeError as e:
-            logging.warning(f'Repo for team {team_name} was cloned but has no tag {branch}, removing it...: {e.stderr.replace(token,"")}')
-            shutil.rmtree(repo_path)
-            # teams_notag.append(team_name)
-            team_info.update({'git':'failed'})
-            team_info.update({'comments':f'Repo for team {team_name} was cloned but has no tag {branch}, removing it...: {e.stderr.replace(token,"")}'})
-            # repo.close()
-        except Exception as e:
-            logging.error(
-                f'Repo for team {team_name} cloned but unknown error when getting tag {branch}; should not happen. Stopping... {e.stderr.replace(token,"")}')
-            team_info.update({'git':'failed'})
-            team_info.update({'comments':f'Repo for team {team_name} cloned but unknown error when getting tag {branch}; should not happen. Stopping... {e.stderr.replace(token,"")}'})
-            # repo.close()  
-    else:
-        team_info.update({'git':'succ'})
-
-    if team_info['git'] == 'succ':
-        try:
-            if not os.path.exists(f"agents/{team_name}"):
-                shutil.copytree(f"{repo_path}/agents/{team_name}", f"agents/{team_name}")
-        except:
-            traceback.print_exc()
-            team_info.update({'comments':f'agents/{team_name} is not found'})
-        shutil.rmtree(f"{repo_path}")
-    team_info.update({'copy_files':os.path.exists(f"agents/{team_name}/myTeam.py")})
-    return team_info
-
 
 def loadAgent(matches,superQuiet = True):
     teams = matches['teams']
@@ -204,8 +104,6 @@ def run(options,msg):
     # fill in the defaults
     agent_names = options.agent_names.split(",")
     agents = options.agents.split(",")
-    agent_urls = options.agent_urls.split(",")
-    agent_commit_ids = options.agent_commit_ids.split(",")
 
 
     missing  = num_of_agents-len(agent_names)
@@ -215,23 +113,18 @@ def run(options,msg):
     for i in range(missing):
         agents.append(DEFAULT_AGENT)
 
-    # from Yinsh.yinsh_model import YinshGameRule as GameRule
-    # from Yinsh.yinsh_displayer import TextDisplayer,GUIDisplayer
     matches = {}
     matches['games'] = []
     matches.update({'teams':{}})
     matches.update({'num_of_games': options.multipleGames})
+
     # load agents info
     for i in range(num_of_agents):
         team_info = {}
         team_info['team_name'] = agent_names[i]
         team_info['agent'] = agents[i]
-        if options.cloud:
-            team_info['url'] = agent_urls[i]
-            team_info['commit_id'] = agent_commit_ids[i]
-            clone_result = gitCloneTeam(team_info, "temp")
-            team_info.update(clone_result)
         matches['teams'].update({i:team_info})
+
     # Load game based on name
     game_name = options.game 
     # matches.update({'game_name':game_name})
@@ -258,16 +151,9 @@ def run(options,msg):
     elif options.quiet or options.superQuiet:
         displayer = None
 
-    # if random seed is not provide, using timestamp
-    if options.setRandomSeed == 90054:
-        random_seed = int(str(time.time()).replace('.', ''))
-    else:
-        random_seed = options.setRandomSeed
-    
     # make sure random seed is traceable
     random.seed(random_seed)
     seed_list = [random.randint(0,1e10) for _ in range(1000)]
-    seed_list[0] = random_seed
     seed_idx = 0
 
     num_of_warning = options.numOfWarnings
@@ -429,29 +315,14 @@ def loadParameter():
                     - starts a fully automated game where Citrine team is a custom agent and the rest are random.
     """
     parser = OptionParser(usageStr)
-    # parser.add_option('-r','--red', help='Red team agent file', default=DEFAULT_AGENT)
-    # parser.add_option('-b','--blue', help='Blue team agent file', default=DEFAULT_AGENT) 
+
     parser.add_option('-a','--agents', help='A list of the agents, etc, agents.myteam.player', default="agents.generic.random,agents.generic.random") 
-
-    # parser.add_option('--redName', help='Red agent name', default='Red')
-    # parser.add_option('--blueName', help='Blue agent name', default='Blue') 
     parser.add_option('--agent_names', help='A list of agent names', default="random0,random1") 
-
-    # whether load team from cloud
-    parser.add_option('--cloud', action='store_true', help='Download the agent from the cloud (default: False, the team_name should be different)', default=False)
-
-    # parser.add_option('--redURL', help='Red team repo URL', default=None) 
-    # parser.add_option('--redCommit', help='Red team commit id', default=None) 
-    # parser.add_option('--blueURL', help='Blue team repo URL', default=None) 
-    # parser.add_option('--blueCommit', help='Blue team commit id', default=None) 
-
-    parser.add_option('--agent_urls', help='A list of urls', default="")
-    parser.add_option('--agent_commit_ids', help='A list of commit ids', default="") 
 
     parser.add_option('-n', '--num_of_agents', type='int',help='The number of agents in this game', default=2)
 
     parser.add_option('-t','--textgraphics', action='store_true', help='Display output as text only (default: False)', default=False)
-    parser.add_option('-g','--game', help='The name of the game, starting with a uppercase character (default: Yinsh)', default="Yinsh")
+    parser.add_option('-g','--game', help='The name of the game, starting with a uppercase character (default: Azul)', default="Azul")
     parser.add_option('-q','--quiet', action='store_true', help='No text nor graphics output, only show game info', default=False)
     parser.add_option('-Q', '--superQuiet', action='store_true', help='No output at all', default=False)
     parser.add_option('-w', '--warningTimeLimit', type='float',help='Time limit for a warning of one move in seconds (default: 1)', default=1.0)
@@ -465,15 +336,15 @@ def loadParameter():
     parser.add_option('--replay', default=None, help='Replays a recorded game file by a relative path')
     parser.add_option('--delay', type='float', help='Delay action in a play or replay by input (float) seconds (default 0.1)', default=0.1)
     parser.add_option('-p','--print', action='store_true', help='Print all the output in terminal when playing games, will diable \'-l\' automatically. (default: False)', default=False)
-    # parser.add_option('--half-scale', action='store_true', help='Display game at half-scale (default is 1920x1080)', default=False)
-    parser.add_option('--half-scale', action='store_true', help='This function is not supported in Azul', default=False)
-    parser.add_option('--interactive', action='store_true', help="This function is not supported in Azul.", default=False)   
+    parser.add_option('--half-scale', action='store_true', help='Display game at half-scale (default is 1920x1080)', default=False)
+    # parser.add_option('--interactive', action='store_true', help="Gives the user control over the Citrine agent's actions", default=False)   
 
     options, otherjunk = parser.parse_args(sys.argv[1:] )
     assert len(otherjunk) == 0, "Unrecognized options: " + str(otherjunk)
     # if options.interactive:
     #     options.citrineName = 'Human'
     return options
+
 
 
 # MAIN ---------------------------------------------------------------------------------------------------------------#
@@ -492,16 +363,19 @@ if __name__ == '__main__':
     > python runner.py --help
     """
     msg = ""
-
     options = loadParameter()
-    
-    with open(f"{options.output}/matches.json",'w') as f:
-        json.dump({},f)  
-    
     matches = run(options,msg)
-    if not os.path.exists(options.output):
-        os.makedirs(options.output)
-    with open(f"{options.output}/matches.json",'w') as f:
+    if not os.path.exists("output/"):
+        os.mkdir("output")
+
+    if os.path.exists("output/team_info.json"):
+        with open("output/team_info.json","r") as f:
+            team_info = json.load(f)
+        for key in team_info['teams'].keys():
+            team_info['teams'][key]['team_name'] = matches['teams'][int(key)]['team_name']
+            # team_info['teams'][key]['load_agent'] = matches['teams'][key]['load_agent']
+            matches['teams'][int(key)].update(team_info['teams'][key])
+    with open("output/matches.json",'w') as f:
         json.dump(matches,f)  
 
 
