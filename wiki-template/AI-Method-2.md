@@ -1,4 +1,4 @@
-# AI Method 1 - Computational Approach
+# AI Method 2 - Computational Approach
 
 Your notes about this part of the project, including acknowledgement, comments, strengths and limitations, etc.
 
@@ -9,7 +9,6 @@ If you use greed best first search, then, you can explain about what is the prob
 If you use MCTS, then, you can explain about what tree policy/simulation policy you used, how many iteration did you run, what is your reward function, the depth of each simulation etc.
 
 # Table of Contents
-- [Governing Strategy Tree](#governing-strategy-tree)
   * [Motivation](#motivation)
   * [Application](#application)
   * [Solved challenges](#solved-challenges)
@@ -17,9 +16,7 @@ If you use MCTS, then, you can explain about what tree policy/simulation policy 
      - [Advantages](#advantages)
      - [Disadvantages](#disadvantages)
   * [Future improvements](#future-improvements)
-
-## Governing Strategy Tree  
-
+ 
 ### Motivation  
 
 
