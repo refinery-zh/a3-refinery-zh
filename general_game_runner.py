@@ -20,8 +20,6 @@ import time
 import pickle
 import random
 import git
-import shutil
-import logging
 import pytz
 import json
 from template import Agent as DummyAgent
