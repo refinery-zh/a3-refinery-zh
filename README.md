@@ -23,24 +23,25 @@ The purpose of this project is to implement an autonomous agent that can play th
 
 ### Table of contents
 
-  * [1. Your task](#1-your-task)
-     * [Important basic rules](#important-basic-rules)
-  * [2. Deliverables and submission](#2-deliverables-and-submission)
-     * [Preliminary submission (Friday week 9)](#preliminary-individual-submission-friday-week-9)
-     * [Wiki and Final submission (Monday week 12)](#wiki-and-final-submission-monday-week-12)
-     * [Individual Reflection (Friday week 12)](#individual-reflection-friday-week-12)
-  * [3. Online Server](#3-online-server)
-  * [4. Marking Criteria](#4-marking-criteria)
-  * [5. Important information](#5-important-information)
-     * [How to create the Wiki](#how-to-create-the-wiki)
-     * [Corrections](#corrections)
-     * [Late submissions &amp; extensions](#late-submissions--extensions)
-     * [About this repo](#about-this-repo)
-     * [Academic Dishonesty](#academic-dishonesty)
-  * [6. COMP90054 Code of Honour &amp; Fair Play](#6-comp90054-code-of-honour--fair-play)
-  * [7. Conclusion](#7-conclusion)
-     * [Acknowledgements](#acknowledgements)
-
+* [Azul Project Template](#azul-project-template)
+* [1. Your task](#1-your-task)
+  * [Important basic rules](#important-basic-rules)
+* [2. Deliverables and submission](#2-deliverables-and-submission)
+  * [Team Registration: (18:00 Monday Week 9)](#team-registration-1800-monday-week-9)
+  * [Preliminary (Individual) submission (18:00 Friday week 9) (10 Marks)](#preliminary-individual-submission-1800-friday-week-9-10-marks)
+  * [Wiki and Final Submission (18:00 Monday week 12) (25 Marks)](#wiki-and-final-submission-1800-monday-week-12-25-marks)
+  * [Individual Reflection (18:00 Friday week 12) (affecting 25 Marks)](#individual-reflection-1800-friday-week-12-affecting-25-marks)
+* [3. Online Server](#3-online-server)
+* [4. Marking Criteria](#4-marking-criteria)
+* [5. Important information](#5-important-information)
+  * [How to create the Wiki](#how-to-create-the-wiki)
+  * [Corrections](#corrections)
+  * [Late submissions & extensions](#late-submissions--extensions)
+  * [About this repo](#about-this-repo)
+  * [Academic Dishonesty](#academic-dishonesty)
+* [6. COMP90054 Code of Honour & Fair Play](#6-comp90054-code-of-honour--fair-play)
+* [7. Teamwork and Software Engineering professional practice](#7-teamwork-and-software-engineering-professional-practice)
+* [8. Conclusion](#8-conclusion)
 
 
 ## 1. Your task
