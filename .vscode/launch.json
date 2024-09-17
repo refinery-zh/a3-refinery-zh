@@ -21,6 +21,15 @@
             "console": "integratedTerminal",
             "args": [],
             "pythonPath": "/home/higherorder2/miniconda3/envs/2024s2_comp90054a3/bin/python"
+        },
+        {
+            "name": "Python Debugger: testfield.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/testfield.py",
+            "console": "integratedTerminal",
+            "args": [],
+            "pythonPath": "/home/higherorder2/miniconda3/envs/2024s2_comp90054a3/bin/python"
         }
     ]
 }

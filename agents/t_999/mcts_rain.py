@@ -3,41 +3,132 @@ from math import sqrt, log
 from Azul.azul_model import AzulGameRule as GameRule
 import random
 import time
+import typing
+from typing import Any, List, Optional
+from Azul.azul_model import AzulState, AzulGameRule as GameRule
+
 
 THINKTIME = 0.9
 NUM_PLAYERS = 2
 
 class MCTSNode:
-    def __init__(self, agent_id, state, parent=None):
+    """
+    Represents a node in the Monte Carlo Tree Search.
+
+    Attributes:
+        state (Any): The game state at this node.
+        parent (Optional[MCTSNode]): The parent node, or None if this is the root.
+        children (List[MCTSNode]): List of child nodes.
+        visits (int): Number of times this node has been visited.
+        wins (float): Number of wins accumulated through this node.
+        agent_id (int): The ID of the agent at this node.
+
+    Example:
+        >>> game_state = GameState()  # Assuming a GameState class exists
+        >>> root_node = MCTSNode(agent_id=0, state=game_state)
+        >>> child_node = MCTSNode(agent_id=1, state=game_state, parent=root_node)
+        >>> root_node.children.append(child_node)
+
+        new_node = MCTSNode((node.agent_id + 1) % NUM_PLAYERS, new_state, node)
+                
+    """
+
+    def __init__(self, agent_id: int, state: AzulState, parent: Optional['MCTSNode'] = None) -> None:
         self.state = state
         self.parent = parent
-        self.children = []
-        self.visits = 0
-        self.wins = 0
-        self.agent_id = agent_id
+        self.children: List['MCTSNode'] = []
+        self.visits: int = 0
+        self.wins: float = 0
+        self.agent_id: int = agent_id
 
-    def uct(self):
+    def uct(self) -> float:
+        """
+        Calculate the Upper Confidence Bound 1 (UCB1) value for this node.
+
+        Returns:
+            float: The UCB1 value.
+
+        Example:
+            >>> node = MCTSNode(agent_id=0, state=AzulState)
+            >>> node.visits = 10
+            >>> node.wins = 7
+            >>> node.parent = MCTSNode(agent_id=1, state=AzulState)
+            >>> node.parent.visits = 100
+            >>> print(f"{node.uct():.4f}")
+            0.8839  # This value may vary
+        """
         if self.visits == 0:
             return float('inf')  # Avoid division by zero
         # UCB1 formula
         return (self.wins / self.visits) + sqrt(2 * log(self.parent.visits) / self.visits)
 
-    def is_fully_expanded(self):
+    def is_fully_expanded(self) -> bool:
+        """
+        Check if all possible actions from this node have been explored.
+
+        Returns:
+            bool: True if the node is fully expanded, False otherwise.
+
+        Example:
+            >>> node = MCTSNode(agent_id=0, state=AzulState)
+            >>> print(node.is_fully_expanded())
+            False  # Assuming no children have been added yet
+        """
         # A node is fully expanded if all possible actions have been taken as children
         return len(self.children) == len(GameRule(NUM_PLAYERS).getLegalActions(self.state, self.agent_id))
 
 
 class MCTS:
-    def __init__(self):
+    """
+    Implements the Monte Carlo Tree Search algorithm.
+
+    Attributes:
+        game_rule (GameRule): An instance of the game rules.
+
+    Example:
+        >>> mcts = MCTS()
+        >>> root_node = MCTSNode(agent_id=0, state=AzulState)
+        >>> best_child = mcts.select(root_node)
+    """
+
+    def __init__(self) -> None:
         self.game_rule = GameRule(NUM_PLAYERS)
 
-    def select(self, node):
+    def select(self, node: MCTSNode) -> MCTSNode:
+        """
+        Select a node to expand using the UCT algorithm.
+
+        Args:
+            node (MCTSNode): The starting node for selection.
+
+        Returns:
+            MCTSNode: The selected node for expansion.
+
+        Example:
+            >>> mcts = MCTS()
+            >>> root = MCTSNode(agent_id=0, state=GameState())
+            >>> selected_node = mcts.select(root)
+        """
         # Selection: keep traversing the child with the highest UCT value until a leaf node is reached
         while node.children:
             node = max(node.children, key=lambda n: n.uct())
         return node
 
-    def expand(self, node):
+    def expand(self, node: MCTSNode) -> MCTSNode:
+        """
+        Expand the given node by adding a child node for an unexplored action.
+
+        Args:
+            node (MCTSNode): The node to expand.
+
+        Returns:
+            MCTSNode: Either a new child node or the input node if fully expanded.
+
+        Example:
+            >>> mcts = MCTS()
+            >>> node = MCTSNode(agent_id=0, state=AzulState)
+            >>> expanded_node = mcts.expand(node)
+        """
         # Expansion: create a child for each unvisited action
         print(f'Is fully expanded: {node.is_fully_expanded()}')
         if not node.is_fully_expanded():
@@ -55,7 +146,23 @@ class MCTS:
             return random.choice(node.children) if node.children else node
         return node
 
-    def simulate(self, node):
+    def simulate(self, node: MCTSNode) -> List[int]:
+        """
+        Simulate a game from the given node to completion using random moves.
+
+        Args:
+            node (MCTSNode): The starting node for the simulation.
+
+        Returns:
+            List[int]: A list of final scores for each player.
+
+        Example:
+            >>> mcts = MCTS()
+            >>> node = MCTSNode(agent_id=0, state=AzulState)
+            >>> final_scores = mcts.simulate(node)
+            >>> print(final_scores)
+            [42, 37]  # Example scores
+        """
         # Simulation: perform a random rollout from the current state to the end of the game
         game_state = deepcopy(node.state)
         current_agent_id = node.agent_id
@@ -73,7 +180,19 @@ class MCTS:
         print(f'Simulated scores: {score_0}, {score_1}')
         return [score_0, score_1]
 
-    def backpropagate(self, node, result):
+    def backpropagate(self, node: MCTSNode, result: List[int]) -> None:
+        """
+        Update the statistics of the nodes in the path from the given node to the root.
+
+        Args:
+            node (MCTSNode): The leaf node to start backpropagation from.
+            result (List[int]): The simulation result (scores) to backpropagate.
+
+        Example:
+            >>> mcts = MCTS()
+            >>> leaf_node = MCTSNode(agent_id=1, state=AzulState)
+            >>> mcts.backpropagate(leaf_node, [42, 37])
+        """
         # Backpropagation: update the visited nodes with the result
         while node:
             node.visits += 1
@@ -111,3 +230,6 @@ class myAgent:
             best_action = random.choice(actions)
 
         return best_action
+    
+
+    __all__ = ['MCTSNode', 'MCTS','myAgent']
