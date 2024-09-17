@@ -157,7 +157,7 @@ def run(options,msg):
     
     # make sure random seed is traceable
     random.seed(random_seed)
-    seed_list = [random.randint(0,1e10) for _ in range(1000)]
+    seed_list = [random.randint(0,int(1e10)) for _ in range(1000)]
     seed_list[0] = random_seed
     seed_idx = 0
 

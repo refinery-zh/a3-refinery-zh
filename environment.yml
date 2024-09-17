@@ -1,21 +1,22 @@
 name: 2024s2_comp90054a3
 channels:
   - defaults
+  - conda-forge
 dependencies:
-  - ca-certificates=2024.7.2=hca03da5_0
-  - libcxx=14.0.6=h848a8c0_0
-  - libffi=3.4.4=hca03da5_1
-  - ncurses=6.4=h313beb8_0
-  - openssl=3.0.15=h80987f9_0
-  - pip=24.2=py38hca03da5_0
-  - python=3.8.19=hb885b13_0
-  - readline=8.2=h1a28f6b_0
-  - setuptools=72.1.0=py38hca03da5_0
-  - sqlite=3.45.3=h80987f9_0
-  - tk=8.6.14=h6ba3021_0
-  - wheel=0.43.0=py38hca03da5_0
-  - xz=5.4.6=h80987f9_1
-  - zlib=1.2.13=h18a0788_1
+  - ca-certificates
+  - libcxx
+  - libffi
+  - ncurses
+  - openssl
+  - pip
+  - python=3.8
+  - readline
+  - setuptools
+  - sqlite
+  - tk
+  - wheel
+  - xz
+  - zlib
   - pip:
       - func-timeout==4.3.5
       - gitdb==4.0.11
