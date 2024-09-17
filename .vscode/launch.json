@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: general_game_runner.py with Arguments",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/general_game_runner.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-a",
+                "agents.t_999.mcts"
+            ],
+            "pythonPath": "/home/higherorder2/miniconda3/envs/2024s2_comp90054a3/bin/python"
+        },
+        {
+            "name": "Python Debugger: test-mcts_rain.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/test-mcts_rain.py",
+            "console": "integratedTerminal",
+            "args": [],
+            "pythonPath": "/home/higherorder2/miniconda3/envs/2024s2_comp90054a3/bin/python"
+        }
+    ]
+}
