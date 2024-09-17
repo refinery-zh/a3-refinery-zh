@@ -76,6 +76,8 @@ def ScoreState(state):
     
     # Agents cannot be assigned a negative score in any round.
     score_change = score_inc + penalties
+    print(score_inc, penalties)
+    print(score, score_change)
     score += score_change
     if score < 0:
         score = 0
