@@ -12,6 +12,7 @@
 import time, random
 from Azul.azul_model import AzulGameRule as GameRule
 from Azul.azul_model import AzulState
+import Azul.azul_utils as utils
 from copy import deepcopy
 from collections import deque
 import numpy as np
@@ -32,6 +33,7 @@ def GetScore(id, game_state: AzulState):
 def ScoreState(agent_state: AzulState.AgentState):
     score_inc = 0
     grid_state = deepcopy(agent_state.grid_state)
+    number_of = deepcopy(agent_state.number_of)
     score = agent_state.score
 
     # 1. Action tiles across from pattern lines to the wall grid
@@ -44,6 +46,7 @@ def ScoreState(agent_state: AzulState.AgentState):
 
             # Tile will be placed at position (i,col) in grid
             grid_state[i][col] = 1
+            number_of[tc] += 1
 
             # count the number of tiles in a continguous line
             # above, below, to the left and right of the placed tile.
@@ -94,9 +97,28 @@ def ScoreState(agent_state: AzulState.AgentState):
     for i in range(len(agent_state.floor)):
         penalties += agent_state.floor[i] * agent_state.FLOOR_SCORES[i]
 
-    rows = agent_state.GetCompletedRows()
-    cols = agent_state.GetCompletedColumns()
-    sets = agent_state.GetCompletedSets()
+    rows = 0
+    for i in range(agent_state.GRID_SIZE):
+        allin = True
+        for j in range(agent_state.GRID_SIZE):
+            if grid_state[i][j] == 0:
+                allin = False
+                break
+        if allin:
+            rows += 1
+    cols = 0
+    for i in range(agent_state.GRID_SIZE):
+        allin = True
+        for j in range(agent_state.GRID_SIZE):
+            if grid_state[j][i] == 0:
+                allin = False
+                break
+        if allin:
+            cols += 1
+    sets = 0
+    for tile in utils.Tile:
+        if number_of[tile] == agent_state.GRID_SIZE:
+            completed += 1
 
     bonus = (rows * agent_state.ROW_BONUS) + (cols * agent_state.COL_BONUS) + (sets * agent_state.SET_BONUS)
     # Agents cannot be assigned a negative score in any round.
