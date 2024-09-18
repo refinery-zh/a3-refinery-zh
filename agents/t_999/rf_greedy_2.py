@@ -11,8 +11,7 @@ NUM_PLAYERS = 2
 
 def GetScore(id, game_state:AzulState):
     my_gs = game_state.agents[id]
-    op_gs = game_state.agents[1-id]
-    return ScoreState(my_gs) - ScoreState(op_gs)
+    return ScoreState(my_gs)
 
 def ScoreState(agent_state:AzulState.AgentState):
     score_inc = 0
@@ -107,12 +106,21 @@ class myAgent(Agent):
     def SelectAction(self,actions,game_state):
         scores = []
         for a in actions:
-            t_gs = deepcopy(game_state)
-            goal = self.DoAction(t_gs, a)
-            new_score = GetScore(self.id, t_gs)
-            if goal and new_score < 0:
-                new_score = 0
-            scores.append(new_score)
+            op_scores = []
+            gs = deepcopy(game_state)
+            gs = self.game_rule.generateSuccessor(gs, a, self.id)
+            score = GetScore(self.id, gs)
+            if len(actions) < 60:
+                new_actions = self.game_rule.getLegalActions(gs, 1-self.id)
+                for na in new_actions:
+                    ngs = deepcopy(gs)
+                    ngs = self.game_rule.generateSuccessor(ngs, na, 1-self.id)
+                    new_score = GetScore(1-self.id, ngs)
+                    op_scores.append(new_score)
+                ops = np.max(op_scores)
+                scores.append(score - ops)
+            else:
+                scores.append(score)
         return actions[np.argmax(scores)]
         # return random.choice(actions)
 
