@@ -1,5 +1,5 @@
 from Azul.azul_utils import Tile
-from agents.t_XXX.myTeam import *
+from agents.t_999.myTeam import *
 from Azul.azul_model import AzulState
 import numpy as np
 if __name__ == "__main__":
