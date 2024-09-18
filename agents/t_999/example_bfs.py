@@ -47,12 +47,13 @@ class myAgent():
     def SelectAction(self, actions, rootstate):
         start_time = time.time()
         queue      = deque([ (deepcopy(rootstate),[]) ]) # Initialise queue. First node = root state and an empty path.
-        
+        cnt = 0
         # Conduct BFS starting from rootstate.
         while len(queue) and time.time()-start_time < THINKTIME:
+            cnt += 1
             state, path = queue.popleft() # Pop the next node (state, path) in the queue.
             new_actions = self.GetActions(state) # Obtain new actions available to the agent in this state.
-            
+            # print(len(new_actions))
             for a in new_actions: # Then, for each of these actions...
                 next_state = deepcopy(state)              # Copy the state.
                 next_path  = path + [a]                   # Add this action to the path.
@@ -62,7 +63,9 @@ class myAgent():
                     return next_path[0] # If the current action reached the goal, return the initial action that led there.
                 else:
                     queue.append((next_state, next_path)) # Else, simply add this state and its path to the queue.
-        
+        print("*"*50)
+        print(cnt)
+        print("*"*50)
         return random.choice(actions) # If no goal was found in the time limit, return a random action.
         
     
