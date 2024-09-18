@@ -2,24 +2,30 @@ from template import Agent
 import time, random
 import numpy as np
 from Azul.azul_model import AzulGameRule as GameRule
+from Azul.azul_model import AzulState
 from copy import deepcopy
 from collections import deque
 
 THINKTIME   = 0.9
 NUM_PLAYERS = 2
 
-def ScoreState(state):
+def GetScore(id, game_state:AzulState):
+    my_gs = game_state.agents[id]
+    op_gs = game_state.agents[1-id]
+    return ScoreState(my_gs) - ScoreState(op_gs)
+
+def ScoreState(agent_state:AzulState.AgentState):
     score_inc = 0
-    grid_state = deepcopy(state.grid_state)
-    score = state.score
+    grid_state = deepcopy(agent_state.grid_state)
+    score = agent_state.score
 
     # 1. Action tiles across from pattern lines to the wall grid
-    for i in range(state.GRID_SIZE):
+    for i in range(agent_state.GRID_SIZE):
         # Is the pattern line full? If not it persists in its current
         # state into the next round.
-        if state.lines_number[i] == i+1:
-            tc = state.lines_tile[i]
-            col = int(state.grid_scheme[i][tc])
+        if agent_state.lines_number[i] == i+1:
+            tc = agent_state.lines_tile[i]
+            col = int(agent_state.grid_scheme[i][tc])
 
             # Tile will be placed at position (i,col) in grid
             grid_state[i][col] = 1
@@ -33,7 +39,7 @@ def ScoreState(state):
                 if val == 0:
                     break
             below = 0
-            for j in range(col+1,state.GRID_SIZE,1):
+            for j in range(col+1,agent_state.GRID_SIZE,1):
                 val = grid_state[i][j]
                 below +=  val
                 if val == 0:
@@ -45,7 +51,7 @@ def ScoreState(state):
                 if val == 0:
                     break
             right = 0
-            for j in range(i+1, state.GRID_SIZE, 1):
+            for j in range(i+1, agent_state.GRID_SIZE, 1):
                 val = grid_state[j][col]
                 right += val
                 if val == 0:
@@ -70,15 +76,15 @@ def ScoreState(state):
 
     # Score penalties for tiles in floor line
     penalties = 0
-    for i in range(len(state.floor)):
-        penalties += state.floor[i]*state.FLOOR_SCORES[i]
+    for i in range(len(agent_state.floor)):
+        penalties += agent_state.floor[i]*agent_state.FLOOR_SCORES[i]
     
     
     # Agents cannot be assigned a negative score in any round.
     score_change = score_inc + penalties
     score += score_change
-    # if score < 0:
-    #     score = 0
+    if score < 0:
+        score = 0
     return score
 
 class myAgent(Agent):
@@ -99,17 +105,15 @@ class myAgent(Agent):
         return goal_reached
         
     def SelectAction(self,actions,game_state):
-        print("-"*25)
         gs = deepcopy(game_state)
-        original_score = gs.agents[self.id].score
         scores = []
         for a in actions:
             t_gs = deepcopy(game_state)
             goal = self.DoAction(t_gs, a)
-            new_score = ScoreState(t_gs.agents[self.id])
+            new_score = GetScore(self.id, t_gs)
             if goal and new_score < 0:
                 new_score = 0
-            scores.append(new_score-original_score)
+            scores.append(new_score)
         return actions[np.argmax(scores)]
         # return random.choice(actions)
 
