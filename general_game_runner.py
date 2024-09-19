@@ -157,7 +157,7 @@ def run(options,msg):
     
     # make sure random seed is traceable
     random.seed(random_seed)
-    seed_list = [random.randint(0,1e10) for _ in range(1000)]
+    seed_list = [random.randint(0,int(1e10)) for _ in range(1000)]
     seed_list[0] = random_seed
     seed_idx = 0
 
@@ -198,7 +198,7 @@ def run(options,msg):
                         agents_namelist=agent_names,
                         interactive=options.interactive)
             if not options.print:
-                with HidePrint(options.saveLog,file_path,f_name):
+                # with HidePrint(options.saveLog,file_path,f_name):
                     print("Following are the print info for loading:\n{}\n".format(msg))
                     print("\n-------------------------------------\n")
                     print("Following are the print info from the game:\n")

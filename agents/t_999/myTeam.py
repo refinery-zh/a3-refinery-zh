@@ -4,11 +4,19 @@ import numpy as np
 from Azul.azul_model import AzulGameRule as GameRule
 from copy import deepcopy
 from collections import deque
+from Azul.azul_model import AzulState
+
+
+
+
 
 THINKTIME   = 0.9
 NUM_PLAYERS = 2
 
-def ScoreState(state):
+def ScoreState(state: AzulState.AgentState) -> int:
+    """
+    ScoreState
+    """
     score_inc = 0
     grid_state = deepcopy(state.grid_state)
     score = state.score

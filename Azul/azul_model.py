@@ -11,19 +11,21 @@ class AzulState(GameState):
     NUM_TILE_TYPE = 20
     NUM_ON_FACTORY = 4
 
+    from typing import Dict
+    import utils
 
     class TileDisplay:
         def __init__(self):
             # Map between tile colour and number in the display
-            self.tiles = {}
+            self.tiles: Dict[utils.Tile, int] = {}
 
             # Total number of tiles in the display
-            self.total = 0
+            self.total: int = 0
 
             for tile in utils.Tile:
                 self.tiles[tile] = 0
 
-        def ReactionTiles(self, number, tile_type):
+        def ReactionTiles(self, number: int, tile_type: utils.Tile) -> None:
             assert number > 0
             assert tile_type in utils.Tile
             assert tile_type in self.tiles
@@ -34,7 +36,7 @@ class AzulState(GameState):
             assert self.tiles[tile_type] >= 0
             assert self.total >= 0
 
-        def AddTiles(self, number, tile_type):
+        def AddTiles(self, number: int, tile_type: utils.Tile) -> None:
             assert number > 0
             assert tile_type in utils.Tile
             assert tile_type in self.tiles
@@ -65,6 +67,11 @@ class AzulState(GameState):
             #    [Tile.RED,Tile.BLACK,Tile.WHITE,Tile.BLUE,Tile.YELLOW],
             #    [Tile.YELLOW,Tile.RED,Tile.BLACK,Tile.WHITE,Tile.BLUE]
             #]
+            """
+            grid scheme is to say which tile should go where in the grid state
+            
+            """
+
             self.grid_scheme = numpy.zeros((self.GRID_SIZE,self.GRID_SIZE))
             self.grid_scheme[0][utils.Tile.BLUE] = 0
             self.grid_scheme[1][utils.Tile.BLUE] = 1
