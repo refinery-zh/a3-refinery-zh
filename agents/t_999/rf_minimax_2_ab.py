@@ -163,14 +163,14 @@ class myAgent:
                     result = score
                 else:
                     result = max(score, result)
-                if parents != None and parents < result:
+                if parents != None and parents <= result:
                     return np.argmax(scores), result
             else:
                 if result == None:
                     result = score
                 else:
                     result = min(score, result)
-                if parents != None and parents < result:
+                if parents != None and parents >= result:
                     return np.argmin(scores), result
         return np.argmax(scores), result
 
