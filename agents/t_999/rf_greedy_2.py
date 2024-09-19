@@ -95,28 +95,40 @@ def count_adjacent_tiles(grid, row, col, row_step, col_step):
     return count
 
 class myAgent(Agent):
-    def __init__(self, _id: int):
-        self.id = _id
-        self.game_rule = GameRule(NUM_PLAYERS)
+    def __init__(self,_id):
+        self.id = _id # Agent needs to remember its own id.
+        self.game_rule = GameRule(NUM_PLAYERS) # Agent stores an instance of GameRule, from which to obtain functions.
 
-    def GetActions(self, state: AzulState) -> List[str]:
+    def GetActions(self, state):
         return self.game_rule.getLegalActions(state, self.id)
     
-    def DoAction(self, state: AzulState, action: str) -> bool:
+    # Carry out a given action on this state and return True if goal is reached received.
+    def DoAction(self, state, action):
         state = self.game_rule.generateSuccessor(state, action, self.id)
-        return not state.TilesRemaining()
         
-    def SelectAction(self, actions: List[str], game_state: AzulState) -> str:
-        def evaluate_action(action: str) -> float:
-            gs = self.game_rule.generateSuccessor(deepcopy(game_state), action, self.id)
-            score = GetScore(self.id, gs)
-            
-            if len(actions) < 60:
-                opponent_actions = self.game_rule.getLegalActions(gs, 1-self.id)
-                opponent_scores = [GetScore(1-self.id, self.game_rule.generateSuccessor(deepcopy(gs), a, 1-self.id)) for a in opponent_actions]
-                return score - max(opponent_scores, default=0)
-            
-            return score
+        # goal_reached = False #TODO: Students, how should agent check whether it reached goal or not
+        goal_reached = not state.TilesRemaining()
 
-        return max(actions, key=evaluate_action)
+        return goal_reached
+        
+    def SelectAction(self,actions,game_state):
+        scores = []
+        for a in actions:
+            op_scores = []
+            gs = deepcopy(game_state)
+            gs = self.game_rule.generateSuccessor(gs, a, self.id)
+            score = GetScore(self.id, gs)
+            if len(actions) < 60:
+                new_actions = self.game_rule.getLegalActions(gs, 1-self.id)
+                for na in new_actions:
+                    ngs = deepcopy(gs)
+                    ngs = self.game_rule.generateSuccessor(ngs, na, 1-self.id)
+                    new_score = GetScore(1-self.id, ngs)
+                    op_scores.append(new_score)
+                ops = np.max(op_scores)
+                scores.append(score - ops)
+            else:
+                scores.append(score)
+        return actions[np.argmax(scores)]
+        # return random.choice(actions)
 
