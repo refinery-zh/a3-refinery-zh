@@ -181,7 +181,7 @@ class myAgent:
     def SelectAction(self, actions, game_state):
         start_time = time.time()
         depth = int(2*np.log(50) / (np.log(len(actions)+1)+0.1))
-        print(depth)
+        # print(depth)
         if depth < 1:
             depth = 1
         idx, _ = self.dfs_explore(actions, game_state, depth, self.id, "root", start_time)
