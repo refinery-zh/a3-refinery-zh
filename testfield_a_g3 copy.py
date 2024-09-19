@@ -1,14 +1,12 @@
 from Azul.azul_model import AzulGameRule as GameRule
 from Azul.azul_model import AzulState
-from agents.t_999.rf_minimax_2 import myAgent
+from agents.t_999.rf_minimax_2_ab import myAgent
 from agents.generic.random import myAgent as dummy
 
 import numpy as np
 
 
 if __name__ == "__main__":
-    print(int(2*np.log(60)/np.log(60)))
-    exit()
     state = AzulState(2)
     game_rule = GameRule(2)
     # print(state.first_agent)
